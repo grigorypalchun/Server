@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fcntl.h>
 #include <string.h>
+#include <vector>
 
 using namespace std;
 
@@ -15,7 +16,7 @@ int sendall(int s, char *buf, int len, int flags)
 
     while(total < len)
     {
-        n = send(s, buf+total, 64, flags);
+        n = send(s, buf+total, len-total, flags);
         if(n == -1) { break; }
         total += n;
     }
@@ -31,7 +32,7 @@ int recvall(int s, char *buf, int len, int flags)
 
     while(total < len)
     {
-        n = recv(s, buf+total, 64, flags);
+        n = recv(s, buf+total, len-total, flags);
         if(n == -1) { break; }
         total += n;
     }
@@ -90,6 +91,7 @@ int main()
     while(1)
     {
         char buf[1050];
+        vector <int> nums;
 
         bytes_read = 0;
         bytes_read = recvall(udp, buf, 1024, 0);
@@ -97,6 +99,7 @@ int main()
         if (bytes_read > 0)
         {
           cout << buf << '\n';
+
           cout << bytes_read;
           buf[bytes_read] = '\n';
   //        sendto(udp,buf,1024,0, (struct sockaddr *)&addr_u, sizeof(addr_u));
@@ -110,6 +113,20 @@ int main()
           if (bytes_read <= 0) break;
           cout << buf;
         }
+
+
+        for (int i = 0; i < bytes_read; i++)
+          if (buf[i] >= '0' && buf[i] <= '9')
+            nums.push_back(buf[i]);
+        if (nums.size() > 0)
+        {
+            cout << "Numbers are : \n";
+            cout << nums.size();
+            for (int i = 0; i < nums.size(); i++)
+              cout << nums[i] - '0' << ' ';
+        }
+        nums.clear();
+
     }
 
 
